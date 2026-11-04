@@ -6,6 +6,10 @@ Super Mario 64 (sm64ex-alo) on the Anbernic RG DS / RG DS Plus running BananaOS,
 - lives, coins, stars, health and red coins (the top screen no longer draws them)
 - the name of the music that is playing
 
+![Level map on the bottom screen](screenshots/level-map.jpg)
+
+![File select: the bottom screen shows the music title](screenshots/file-select.jpg)
+
 The game runs on the top screen as usual. The bottom screen is drawn through DRM (a dumb buffer on DSI-1), the same way as in [uzdoom-bananaos](https://github.com/GASQBDUV/uzdoom-bananaos).
 
 Not implemented compared with the 3DS port: the touch menu, transition animations and the credits screens. The Mario icon next to the life counter is a red circle.
