@@ -1,0 +1,60 @@
+diff --git a/Makefile b/Makefile
+index 9379b84..3256993 100755
+--- a/Makefile
++++ b/Makefile
+@@ -963,6 +963,14 @@ BACKEND_CFLAGS := -DRAPI_$(RENDER_API)=1 -DWAPI_$(WINDOW_API)=1 -DAAPI_$(AUDIO_A
+ BACKEND_CFLAGS += $(foreach capi,$(CONTROLLER_API),-DCAPI_$(capi)=1)
+ BACKEND_LDFLAGS :=
+ 
++# bananaOS (Anbernic RG DS): level map and HUD on the bottom panel, see bananads-mario
++BANANA_SECOND ?= 0
++ifeq ($(BANANA_SECOND),1)
++  BACKEND_CFLAGS += -DBANANA_SECOND_SCREEN=1
++  BACKEND_CFLAGS += -I/usr/include/libdrm
++  BACKEND_LDFLAGS += -ldrm
++endif
++
+ SDL1_USED := 0
+ SDL2_USED := 0
+ 
+diff --git a/src/game/area.c b/src/game/area.c
+index 0ed47fb..3874f16 100644
+--- a/src/game/area.c
++++ b/src/game/area.c
+@@ -407,7 +407,11 @@ void render_game(void) {
+         gDPSet2d(gDisplayListHead++, 1); // HUD, text labels and cutscene text are 2D
+ #endif
+ 
++#ifdef BANANA_SECOND_SCREEN
++        { extern int banana_ui_active(void); if (!banana_ui_active()) render_hud(); }
++#else
+         render_hud();
++#endif
+         gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+         render_text_labels();
+         do_cutscene_handler();
+diff --git a/src/pc/pc_main.c b/src/pc/pc_main.c
+index 9d4d4e1..ffe5f65 100644
+--- a/src/pc/pc_main.c
++++ b/src/pc/pc_main.c
+@@ -134,6 +134,10 @@ static inline void audio_frame(void) {
+ }
+ #endif
+ 
++#ifdef BANANA_SECOND_SCREEN
++void banana_ui_frame(void);
++#endif
++
+ void produce_one_frame(void) {
+     gfx_start_frame();
+ 
+@@ -147,6 +151,9 @@ void produce_one_frame(void) {
+     audio_frame();
+ #endif
+     gfx_end_frame();
++#ifdef BANANA_SECOND_SCREEN
++    banana_ui_frame();
++#endif
+ 
+ #ifdef HIGH_FPS_PC
+     gfx_start_frame();
